@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import useGeceModu from "./hooks/useGeceModu.js";
 import Charts from "./components/Charts";
 import Navbar from "./components/Navbar";
+import useAxios from "./hooks/useAxios.js";
 
 const App = () => {
-  const [coinData, setCoinData] = useState([]);
-  const [geceModu, setGeceModu] = useState(false);
+  const [geceModu, setGeceModu] = useGeceModu(false);
+  const [coinData, error, loading, getData] = useAxios(
+    "get",
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true"
+  );
 
   useEffect(() => {
-    axios
-      .get(
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true"
-      )
-      .then(res => setCoinData(res.data))
-      .catch(err => console.log(err));
+    getData();
   }, []);
   return (
     <div className={geceModu ? "dark-mode App" : "App"}>
       <Navbar geceModu={geceModu} setGeceModu={setGeceModu} />
-      <Charts coinData={coinData} />
+      {loading ? "loading" : <Charts coinData={coinData} />}
     </div>
   );
 };
